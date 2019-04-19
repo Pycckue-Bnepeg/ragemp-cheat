@@ -1,0 +1,8 @@
+.vs
+target
+x64
+Backup*
+[Dd]ebug/
+[Rr]elease/
+Cargo.lock
+.vscode

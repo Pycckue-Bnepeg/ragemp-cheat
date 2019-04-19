@@ -1,0 +1,11 @@
+[package]
+name = "ragemp-http"
+version = "0.1.0"
+authors = ["ZOTTCE <zottce@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+rocket = "0.4.0"
+reqwest = "0.9.15"
+bytes = "0.4.12"
+twox-hash = "1.2.0"
