@@ -21,12 +21,11 @@ type ManState<'a> = State<'a, Arc<Mutex<Manipulator>>>;
 
 #[get("/")]
 fn list(man: ManState) -> Option<Response<'static>> {
-    let mut req_response = reqwest::get("http://145.239.149.95:22006/list/").ok()?;
+    let mut man = man.lock().unwrap();
+    let mut req_response = reqwest::get(&format!("http://{}/list/", man.origin_host())).ok()?;
     let mut cursor = Cursor::new(vec![]);
 
     req_response.copy_to(&mut cursor).ok()?;
-
-    let mut man = man.lock().unwrap();
     man.generate(&mut cursor);
 
     let response = Response::build()
@@ -42,11 +41,11 @@ fn file(man: ManState, index: usize) -> Option<Response<'static>> {
     let mut cursor = Cursor::new(vec![]);
 
     if man.is_origin_script_index(index) {
-        fetch_and_write(man.origin_script_index(), &mut cursor)?;
+        fetch_and_write(man.origin_host(), man.origin_script_index(), &mut cursor)?;
     } else if man.is_custom_script_index(index) {
         open_and_write(man.script_path(), &mut cursor)?;
     } else {
-        fetch_and_write(index, &mut cursor)?;
+        fetch_and_write(man.origin_host(), index, &mut cursor)?;
     }
 
     let response = Response::build()
@@ -62,8 +61,8 @@ fn open_and_write(path: &Path, cursor: &mut Cursor<Vec<u8>>) -> Option<()> {
     Some(())
 }
 
-fn fetch_and_write(index: usize, cursor: &mut Cursor<Vec<u8>>) -> Option<()> {
-    let mut req_response = reqwest::get(&format!("http://145.239.149.95:22006/file/{}", index)).ok()?;
+fn fetch_and_write(host: &str, index: usize, cursor: &mut Cursor<Vec<u8>>) -> Option<()> {
+    let mut req_response = reqwest::get(&format!("http://{}/file/{}", host, index)).ok()?;
     req_response.copy_to(cursor).ok()?;
     Some(())
 }
@@ -71,10 +70,19 @@ fn fetch_and_write(index: usize, cursor: &mut Cursor<Vec<u8>>) -> Option<()> {
 fn main() {
     use std::hash::Hasher;
 
-    // генерация хеша при старте
-    let mut man = Manipulator::new("./js-scripts/index.js");
+    let host = match std::env::args().skip(1).next() {
+        Some(host) => host,
+        None => {
+            eprintln!("usage: ragemp-http IP:PORT");
+            eprintln!("example: ragemp-http 127.0.0.1:22006");
+            return;
+        }
+    };
 
-    let mut req_response = reqwest::get("http://145.239.149.95:22006/list/").expect("remote server is dead");
+    // генерация хеша при старте
+    let mut man = Manipulator::new("./js-scripts/index.js", host);
+
+    let mut req_response = reqwest::get(&format!("http://{}/list/", man.origin_host())).expect("remote server is dead");
     let mut cursor = Cursor::new(vec![]);
 
     req_response.copy_to(&mut cursor).unwrap();
@@ -84,7 +92,8 @@ fn main() {
     hasher.write(cursor.get_ref());
     let hash = hasher.finish();
 
-    println!("hash: {:16x}", hash);
+    println!("origin http host: {}", man.origin_host());
+    println!("hash replacement: {:16x}", hash);
 
 
     let man = Arc::new(Mutex::new(man));

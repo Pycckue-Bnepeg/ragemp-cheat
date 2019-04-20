@@ -10,6 +10,7 @@ use twox_hash::XxHash;
 const FILENAME: &str = "origin_index.js";
 
 pub struct Manipulator {
+    origin_host: String,
     origin_files_len: usize,
     main_file_idx: usize,
     script_path: PathBuf,
@@ -17,7 +18,7 @@ pub struct Manipulator {
 }
 
 impl Manipulator {
-    pub fn new<P: AsRef<Path>>(path: P) -> Manipulator {
+    pub fn new<P: AsRef<Path>>(path: P, origin_host: String) -> Manipulator {
         let path = path.as_ref();
         let f = File::open(path).unwrap();
         let mut f = BufReader::new(f);
@@ -39,6 +40,7 @@ impl Manipulator {
         }
 
         Manipulator {
+            origin_host,
             origin_files_len: 0,
             main_file_idx: 0,
             script_path: path.into(),
@@ -78,14 +80,9 @@ impl Manipulator {
         let _ = append.write_all(FILENAME.as_bytes());
         append.put_u64_le(origin_hash);
 
-        println!("{:16x}", self.script_hash);
-        println!("{:16x}", origin_hash);
-        println!("{:?}", append.get_ref());
-
         buf.write_all(&append.into_inner());
 
         self.origin_files_len = count;
-        println!("all files: {}", self.origin_files_len);
     }
 
     pub fn is_origin_script_index(&self, index: usize) -> bool {
@@ -102,5 +99,9 @@ impl Manipulator {
 
     pub fn script_path(&self) -> &Path {
         self.script_path.as_path()
+    }
+
+    pub fn origin_host(&self) -> &str {
+        &self.origin_host
     }
 }

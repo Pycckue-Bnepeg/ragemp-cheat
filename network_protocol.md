@@ -2,15 +2,22 @@
 `0xD2` - PACKET_RPC?
 `0x03` - RPC_?? [Outcoming] запрос какой-то параши?
 `0x31` - RPC_?? [Incoming]  хеш файла .listcahce
-`0x32` - RPC_?? [Incoming]  ClientJoin?
+`0x32` - RPC_?? [Outcoming]  ClientJoin?
 ```
-0x32 packet
+## RPC_0x32
 ```
 strlen(2b) -> nickname
 strlen(2b) -> serial?
 strlen(2b) -> socialclub name
 ```
-
+## RPC_0x31
+```
+hash [8 bytes]
+custom_fastdl_host? [1 bit]
+length of host name [2 bytes]
+hostname [n bytes] (строка, если custom_fastdl_host true, иначе порт в двух байтах)
+voice_sample_rate [2 bytes]
+```
 0x31 dump
 ```
 0000   02 00 00 00 45 00 00 36 0e 76 00 00 80 11 00 00   ....E..6.v......

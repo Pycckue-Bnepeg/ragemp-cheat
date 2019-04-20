@@ -1,5 +1,3 @@
-require("./origin_index.js");
-
 mp.events.add('render', () => {
     mp.game.graphics.drawText('hacked ...', [0.5, 0.005], 
     {

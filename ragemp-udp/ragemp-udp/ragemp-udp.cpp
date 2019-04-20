@@ -24,13 +24,21 @@ static void print_buf(const char* title, const unsigned char* buf, size_t buf_le
 	printf("\n");
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-	// здесь целевой сервер
-	std::string remote_addr("145.239.149.95");
-	// std::string remote_addr("127.0.0.1");
-	std::uint16_t remote_port = 22005;
+	if (argc != 5) {
+		std::cerr << "usage: ragemp-udp IP PORT HASH SECURE" << std::endl;
+		std::cerr << "example: ragemp-udp 127.0.0.1 22005 4e9d39bc0513d258 1" << std::endl;
+		return 1;
+	}
+
+	std::string remote_addr(argv[1]);
+	std::uint16_t remote_port = std::strtoul(argv[2], nullptr, 10);
+	std::uint64_t replace_hash = std::strtoull(argv[3], nullptr, 16);
+	bool secure_connection = std::strtol(argv[4], nullptr, 10);
+
 	std::uint16_t proxy_port = 22005;
+	std::uint16_t proxy_http_port = 22006;
 
 	auto remote = RakPeerInterface::GetInstance();
 	auto proxy = RakPeerInterface::GetInstance();
@@ -40,8 +48,8 @@ int main()
 	SocketDescriptor local_socket(proxy_port, 0);
 
 	if (proxy->Startup(8, &local_socket, 1) != RAKNET_STARTED) {
-		std::cout << "couldn't start a proxy server" << std::endl;
-		exit(1);
+		std::cerr << "couldn't start a proxy server" << std::endl;
+		return 1;
 	}
 
 	proxy->SetMaximumIncomingConnections(8);
@@ -52,11 +60,12 @@ int main()
 	Packet* proxy_packet;
 	Packet* remote_packet;
 
-	// без шифрования
-	// public_key.publicKeyMode = PKM_INSECURE_CONNECTION;
-	
-	// с шифрованием
-	public_key.publicKeyMode = PKM_ACCEPT_ANY_PUBLIC_KEY;
+	if (secure_connection) {
+		public_key.publicKeyMode = PKM_ACCEPT_ANY_PUBLIC_KEY;
+	}
+	else {
+		public_key.publicKeyMode = PKM_INSECURE_CONNECTION;
+	}
 
 	// remote address
 	SystemAddress remote_address(remote_addr.c_str(), remote_port);
@@ -65,6 +74,17 @@ int main()
 	SystemAddress client_address;
 
 	std::cout << "the proxy server listen to " << proxy->GetMyBoundAddress().ToString(true, ':') << std::endl;
+	std::cout << std::endl << "settings:" << std::endl;
+	std::cout << "remote host: " << remote_addr << ":" << remote_port;
+	
+	if (secure_connection) {
+		std::cout << " with encryption" << std::endl;
+	}
+	else {
+		std::cout << " without encryption" << std::endl;
+	}
+
+	printf("hash replacement: %llx\n", replace_hash);
 
 	BitStream unsended;
 	bool connected_to_remote = false;
@@ -108,6 +128,7 @@ int main()
 			}
 
 			if ((int)remote_packet->data[0] == ID_CONNECTION_REQUEST_ACCEPTED) {
+				std::cout << "connected to remote host" << std::endl;
 				connected_to_remote = true;
 				remote->Send(&unsended, HIGH_PRIORITY, RELIABLE, 0, remote_address, false);
 				
@@ -123,30 +144,57 @@ int main()
 					
 					// ответ от сервера
 					if (rpc_id == 0x31) {
-						print_buf("old packet", remote_packet->data, remote_packet->length);
-
-						std::uint64_t new_hash = 0x5f9415cf68c0bb3f; // это хеш, взятый из ragemp-http
-						char* buffer = (char*)alloca(5); // хуй проссышь что это
 						out.IgnoreBytes(8); // игнорируем хеш
-						out.Read(buffer, 5);
 
 						BitStream new_packet(out.GetNumberOfBytesUsed());
 						new_packet.Write(packet_id);
 						new_packet.Write(rpc_id);
-						new_packet.Write(new_hash);
-						new_packet.WriteBits((unsigned char*)buffer, BYTES_TO_BITS(5));
-
+						new_packet.Write(replace_hash);
 						
-						print_buf("new packet", new_packet.GetData(), new_packet.GetNumberOfBytesUsed());
+						int bits_to_read = 0;
+						bool custom = out.ReadBit();
+
+						if (custom) {
+							std::uint16_t f = 0;
+							out.Read(f);
+							bits_to_read = f << 3;
+						}
+						else {
+							bits_to_read = 16;
+						}
+
+						char* buffer = (char*)malloc(BITS_TO_BYTES(bits_to_read));
+
+						// похоже на порт откуда качать говно
+						// хост, если не указан fast-dl-host, то просто порт, иначе адрес
+						out.ReadBits((unsigned char*)buffer, bits_to_read);
+
+						std::uint16_t voice_sample_rate = 0;
+						out.Read(voice_sample_rate);
+
+						/*
+						нам это не нужно, перенаправляем в любом случае на наш прокси сервер
+						// fast-dl-host
+						if (custom) {
+							new_packet.Write1();
+							new_packet.Write(BITS_TO_BYTES(bits_to_read));
+						}
+						else {
+							new_packet.Write0();
+						}
+						*/
+
+						new_packet.Write0(); // без fast-dl-host
+						new_packet.Write(proxy_http_port);
+						// voice-chat-sample-rate
+						new_packet.Write(voice_sample_rate);
+
 						proxy->Send(&new_packet, HIGH_PRIORITY, RELIABLE, 0, client_address, false);
 						remote->DeallocatePacket(remote_packet);
 
 						continue;
 					}
 				}
-
-				//out.ResetReadPointer();
-				//out.ResetWritePointer();
 
 				proxy->Send(&out, HIGH_PRIORITY, RELIABLE, 0, client_address, false);
 			}
