@@ -4,13 +4,23 @@
 `0x31` - RPC_?? [Incoming]  хеш файла .listcahce
 `0x32` - RPC_?? [Outcoming]  ClientJoin?
 ```
+## RPC_0x03
+RPC_RequestJoin
+```
+client_version [4 bytes] (на данный момент 6)
+???? [1 byte] (выглядит что всегда 0)
+???? [4 bytes] (не используется?)
+```
+
 ## RPC_0x32
+RPC_Join
 ```
 strlen(2b) -> nickname
-strlen(2b) -> serial?
+strlen(2b) -> serial
 strlen(2b) -> socialclub name
 ```
 ## RPC_0x31
+RPC_ClientPackages
 ```
 hash [8 bytes]
 custom_fastdl_host? [1 bit]
