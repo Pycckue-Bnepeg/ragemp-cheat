@@ -20,7 +20,6 @@
 #include "RakAssert.h"
 #include "Rand.h"
 #include "MessageIdentifiers.h"
-#include <intrin.h>
 #ifdef USE_THREADED_SEND
 #include "SendToThread.h"
 #endif
