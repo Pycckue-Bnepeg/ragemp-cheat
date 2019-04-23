@@ -26,16 +26,15 @@ static void print_buf(const char* title, const unsigned char* buf, size_t buf_le
 
 int main(int argc, char* argv[])
 {
-	if (argc != 5) {
-		std::cerr << "usage: ragemp-udp IP PORT HASH SECURE" << std::endl;
-		std::cerr << "example: ragemp-udp 127.0.0.1 22005 4e9d39bc0513d258 1" << std::endl;
+	if (argc != 4) {
+		std::cerr << "usage: ragemp-udp IP PORT HASH" << std::endl;
+		std::cerr << "example: ragemp-udp 127.0.0.1 22005 4e9d39bc0513d258" << std::endl;
 		return 1;
 	}
 
 	std::string remote_addr(argv[1]);
 	std::uint16_t remote_port = std::strtoul(argv[2], nullptr, 10);
 	std::uint64_t replace_hash = std::strtoull(argv[3], nullptr, 16);
-	bool secure_connection = std::strtol(argv[4], nullptr, 10);
 
 	std::uint16_t proxy_port = 22005;
 	std::uint16_t proxy_http_port = 22006;
@@ -60,12 +59,7 @@ int main(int argc, char* argv[])
 	Packet* proxy_packet;
 	Packet* remote_packet;
 
-	if (secure_connection) {
-		public_key.publicKeyMode = PKM_ACCEPT_ANY_PUBLIC_KEY;
-	}
-	else {
-		public_key.publicKeyMode = PKM_INSECURE_CONNECTION;
-	}
+	public_key.publicKeyMode = PKM_ACCEPT_ANY_PUBLIC_KEY;
 
 	// remote address
 	SystemAddress remote_address(remote_addr.c_str(), remote_port);
@@ -75,14 +69,7 @@ int main(int argc, char* argv[])
 
 	std::cout << "the proxy server listen to " << proxy->GetMyBoundAddress().ToString(true, ':') << std::endl;
 	std::cout << std::endl << "settings:" << std::endl;
-	std::cout << "remote host: " << remote_addr << ":" << remote_port;
-	
-	if (secure_connection) {
-		std::cout << " with encryption" << std::endl;
-	}
-	else {
-		std::cout << " without encryption" << std::endl;
-	}
+	std::cout << "remote host: " << remote_addr << ":" << remote_port << std::endl;
 
 	printf("hash replacement: %llx\n", replace_hash);
 
@@ -125,6 +112,13 @@ int main(int argc, char* argv[])
 		if (remote_packet) {
 			if ((int)remote_packet->data[0] == ID_CONNECTION_LOST) {
 				printf("remote timeout!\n");
+			}
+
+			if ((int)remote_packet->data[0] == ID_OUR_SYSTEM_REQUIRES_SECURITY) {
+				std::cout << "remote server isn't secure, change secure policy" << std::endl;
+				remote->CancelConnectionAttempt(remote_address);
+				public_key.publicKeyMode = PKM_INSECURE_CONNECTION;
+				remote->Connect(remote_addr.c_str(), remote_port, 0, 0, &public_key);
 			}
 
 			if ((int)remote_packet->data[0] == ID_CONNECTION_REQUEST_ACCEPTED) {
