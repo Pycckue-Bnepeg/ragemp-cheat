@@ -1,8 +1,8 @@
-use std::path::{Path, PathBuf};
-use std::io::{Read, Seek, SeekFrom, Write, Cursor};
-use std::hash::Hasher;
 use std::fs::File;
+use std::hash::Hasher;
 use std::io::{BufRead, BufReader};
+use std::io::{Cursor, Read, Seek, SeekFrom, Write};
+use std::path::{Path, PathBuf};
 
 use bytes::{Buf, BufMut};
 use twox_hash::XxHash;
@@ -28,7 +28,7 @@ impl Manipulator {
             let consumed = {
                 let bytes = f.fill_buf().unwrap();
 
-                if bytes.len() == 0 { 
+                if bytes.len() == 0 {
                     break;
                 }
 
@@ -73,9 +73,11 @@ impl Manipulator {
         }
 
         //добавляем в конец оригинальный index.js с сервера, но уже под другим именем
-        let additional_len = FILENAME.len() + std::mem::size_of::<u32>() + std::mem::size_of::<u64>();
+        let additional_len =
+            FILENAME.len() + std::mem::size_of::<u32>() + std::mem::size_of::<u64>();
+
         let mut append = Cursor::new(vec![0; additional_len]);
-        
+
         append.put_u32_le(FILENAME.len() as u32);
         let _ = append.write_all(FILENAME.as_bytes());
         append.put_u64_le(origin_hash);

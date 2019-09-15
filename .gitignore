@@ -6,3 +6,4 @@ Backup*
 [Rr]elease/
 Cargo.lock
 .vscode
+.idea

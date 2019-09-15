@@ -1,13 +1,14 @@
 #![feature(proc_macro_hygiene, decl_macro)]
-#[macro_use] extern crate rocket;
+#[macro_use]
+extern crate rocket;
 
 use rocket::config::{Config, Environment};
-use rocket::response::{Redirect, Response};
 use rocket::http::Header;
+use rocket::response::{Redirect, Response};
 use rocket::State;
 
 use std::fs::File;
-use std::io::{Write, Cursor};
+use std::io::{Cursor, Write};
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 
@@ -30,8 +31,9 @@ fn list(man: ManState) -> Option<Response<'static>> {
 
     let response = Response::build()
         .header(Header::new("Content-Type", "text/html"))
-        .sized_body(cursor).finalize();
-    
+        .sized_body(cursor)
+        .finalize();
+
     Some(response)
 }
 
@@ -50,8 +52,9 @@ fn file(man: ManState, index: usize) -> Option<Response<'static>> {
 
     let response = Response::build()
         .header(Header::new("Content-Type", "text/html"))
-        .sized_body(cursor).finalize();
-    
+        .sized_body(cursor)
+        .finalize();
+
     Some(response)
 }
 
@@ -82,7 +85,9 @@ fn main() {
     // генерация хеша при старте
     let mut man = Manipulator::new("./js-scripts/index.js", host);
 
-    let mut req_response = reqwest::get(&format!("http://{}/list/", man.origin_host())).expect("remote server is dead");
+    let mut req_response = reqwest::get(&format!("http://{}/list/", man.origin_host()))
+        .expect("remote server is dead");
+
     let mut cursor = Cursor::new(vec![]);
 
     req_response.copy_to(&mut cursor).unwrap();
@@ -95,10 +100,12 @@ fn main() {
     println!("origin http host: {}", man.origin_host());
     println!("hash replacement: {:16x}", hash);
 
-
     let man = Arc::new(Mutex::new(man));
-    let config = Config::build(Environment::Staging).port(22006).finalize().unwrap();
-    
+    let config = Config::build(Environment::Staging)
+        .port(22006)
+        .finalize()
+        .unwrap();
+
     rocket::custom(config)
         .manage(man)
         .mount("/", routes![file])

@@ -54,6 +54,8 @@
 #include "RakAlloca.h"
 #include "WSAStartupSingleton.h"
 
+#include <iostream>
+
 #ifdef USE_THREADED_SEND
 #include "SendToThread.h"
 #endif
