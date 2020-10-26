@@ -33,17 +33,14 @@ impl RakPeerInterface {
     pub fn connect(
         &self,
         address: SocketAddr,
-        password: Option<String>,
+        password: Option<&[u8]>,
         public_key: &PublicKey,
     ) -> ConnectionAttemptResult {
         let c_host = CString::new(format!("{}", address.ip())).unwrap();
         let port = address.port();
 
         let (password_ptr, password_len) = match password.as_ref() {
-            Some(password) => (
-                password.as_bytes().as_ptr() as *const i8,
-                password.as_bytes().len() as i32,
-            ),
+            Some(password) => (password.as_ptr() as *const i8, password.len() as i32),
             None => (std::ptr::null(), 0),
         };
 
@@ -107,12 +104,21 @@ impl RakPeerInterface {
         (self.vtable().SetMaximumIncomingConnections)(self.0 as *mut _, max);
     }
 
-    pub fn connection_state<A: Into<sys::AddressOrGUID>>(&self, addr: A) -> sys::ConnectionState::Type {
+    pub fn connection_state<A: Into<sys::AddressOrGUID>>(
+        &self,
+        addr: A,
+    ) -> sys::ConnectionState::Type {
         (self.vtable().GetConnectionState)(self.0 as *mut _, addr.into())
     }
 
     pub fn close_connection<T: Into<sys::AddressOrGUID>>(&self, target: T) {
-        (self.vtable().CloseConnection)(self.0 as *mut _, target.into(), true, 0, PacketPriority::High.into());
+        (self.vtable().CloseConnection)(
+            self.0 as *mut _,
+            target.into(),
+            true,
+            0,
+            PacketPriority::High.into(),
+        );
     }
 
     pub(crate) fn deallocate_packet(&self, packet: *mut sys::Packet) {

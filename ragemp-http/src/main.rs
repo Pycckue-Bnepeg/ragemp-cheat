@@ -23,16 +23,24 @@ type ManState<'a> = State<'a, Arc<Mutex<Manipulator>>>;
 #[get("/")]
 fn list(man: ManState) -> Option<Response<'static>> {
     let mut man = man.lock().unwrap();
-    let mut req_response = reqwest::get(&format!("http://{}/list/", man.origin_host())).ok()?;
+    let mut req_response =
+        reqwest::blocking::get(&format!("http://{}/list/", man.origin_host())).ok()?;
+
     let mut cursor = Cursor::new(vec![]);
 
     req_response.copy_to(&mut cursor).ok()?;
     man.generate(&mut cursor);
 
-    let response = Response::build()
+    let mut response = Response::build()
         .header(Header::new("Content-Type", "text/html"))
+        .header(Header::new("Connection", "close"))
+        .header(Header::new("Server", ""))
         .sized_body(cursor)
         .finalize();
+
+    response.remove_header("Server");
+    response.remove_header("Content-Length");
+    response.remove_header("Date");
 
     Some(response)
 }
@@ -65,7 +73,9 @@ fn open_and_write(path: &Path, cursor: &mut Cursor<Vec<u8>>) -> Option<()> {
 }
 
 fn fetch_and_write(host: &str, index: usize, cursor: &mut Cursor<Vec<u8>>) -> Option<()> {
-    let mut req_response = reqwest::get(&format!("http://{}/file/{}", host, index)).ok()?;
+    let mut req_response =
+        reqwest::blocking::get(&format!("http://{}/file/{}", host, index)).ok()?;
+
     req_response.copy_to(cursor).ok()?;
     Some(())
 }
@@ -85,7 +95,7 @@ fn main() {
     // генерация хеша при старте
     let mut man = Manipulator::new("./js-scripts/index.js", host);
 
-    let mut req_response = reqwest::get(&format!("http://{}/list/", man.origin_host()))
+    let mut req_response = reqwest::blocking::get(&format!("http://{}/list/", man.origin_host()))
         .expect("remote server is dead");
 
     let mut cursor = Cursor::new(vec![]);
@@ -101,7 +111,7 @@ fn main() {
     println!("hash replacement: {:16x}", hash);
 
     let man = Arc::new(Mutex::new(man));
-    let config = Config::build(Environment::Staging)
+    let config = Config::build(Environment::Production)
         .port(22006)
         .finalize()
         .unwrap();

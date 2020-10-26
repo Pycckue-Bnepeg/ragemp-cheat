@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 use bytes::{Buf, BufMut};
 use twox_hash::XxHash;
 
-const FILENAME: &str = "origin_index.js";
+const FILENAME: &str = "origin_.js";
 
 pub struct Manipulator {
     origin_host: String,
@@ -39,12 +39,16 @@ impl Manipulator {
             f.consume(consumed);
         }
 
+        let script_hash = hasher.finish();
+
+        println!("xxxxx: {:16x}", script_hash);
+
         Manipulator {
             origin_host,
             origin_files_len: 0,
             main_file_idx: 0,
             script_path: path.into(),
-            script_hash: hasher.finish(),
+            script_hash,
         }
     }
 
@@ -66,7 +70,9 @@ impl Manipulator {
                 origin_hash = hash as u64;
                 self.main_file_idx = count;
                 buf.seek(SeekFrom::Current(-8)); // замена хеша
-                buf.put_u64_le(self.script_hash);
+                println!("origin: {:16x}", origin_hash);
+                // buf.get_mut().put_u64_le(self.script_hash);
+                buf.write_all(&self.script_hash.to_le_bytes());
             }
 
             count += 1;
@@ -76,13 +82,20 @@ impl Manipulator {
         let additional_len =
             FILENAME.len() + std::mem::size_of::<u32>() + std::mem::size_of::<u64>();
 
-        let mut append = Cursor::new(vec![0; additional_len]);
+        let mut append = Cursor::new(vec![]);
 
-        append.put_u32_le(FILENAME.len() as u32);
+        append.set_position(0);
+        append.seek(SeekFrom::Start(0));
+
+        append.get_mut().put_u32_le(FILENAME.len() as u32);
+        // println!("{}", append.position());
+        append.set_position(4);
         let _ = append.write_all(FILENAME.as_bytes());
-        append.put_u64_le(origin_hash);
+        append.get_mut().put_u64_le(origin_hash);
 
-        buf.write_all(&append.into_inner());
+        println!("{:?}", append.get_mut());
+
+        println!("{:?}", buf.write_all(&append.into_inner()));
 
         self.origin_files_len = count;
     }

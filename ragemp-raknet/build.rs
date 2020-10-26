@@ -1,6 +1,6 @@
 fn main() {
-//    let cat = std::env::var("BIG_x64_PATH").expect("no big_x64 path");
-    let cat = std::env::var("BIG_x64_PATH").unwrap_or(String::from("D:\\sources\\projects\\ragemp-cheat\\ragemp-raknet\\RakNet\\DependentExtensions\\cat\\lib\\cat"));
+    //    let cat = std::env::var("BIG_x64_PATH").expect("no big_x64 path");
+    let cat = std::env::var("BIG_x64_PATH").unwrap_or(String::from("D:\\temp\\sources\\projects\\ragemp-cheat\\ragemp-raknet\\RakNet\\DependentExtensions\\cat\\lib\\cat"));
     let out = cmake::Config::new("RakNet").no_build_target(true).build();
 
     // bindgen wrappers.h -o rakpeer.rs --whitelist-type RakNet::RakPeerInterface --whitelist-type RakNet::BitStream --whitelist-type OutOfBandIdentifiers --whitelist-type DefaultMessageIDTypes --no-layout-tests --enable-cxx-namespaces --no-derive-copy --rust-target nightly --default-enum-style moduleconsts -- -x c++ --std=c++14
@@ -25,7 +25,7 @@ fn main() {
 
     // todo: lib path
     let mut profile = std::env::var("PROFILE").unwrap();
-//    profile.chars().nth(0).unwrap() = profile[0].to_uppercase();
+    //    profile.chars().nth(0).unwrap() = profile[0].to_uppercase();
 
     println!(
         "cargo:rustc-link-search=native={}/build/Lib/LibStatic/{}",

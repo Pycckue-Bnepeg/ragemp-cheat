@@ -204,8 +204,30 @@ impl<'a> BitStream<'a> {
     }
 
     pub fn clone_static(&'a self) -> BitStream<'static> {
-        let slice = unsafe { std::slice::from_raw_parts(self.bs.data, (self.bs.numberOfBitsUsed >> 3) as usize) };
+        let slice = unsafe {
+            std::slice::from_raw_parts(self.bs.data, (self.bs.numberOfBitsUsed >> 3) as usize)
+        };
         BitStream::from(slice)
+    }
+
+    pub fn align_write_to_byte_boundary(&mut self) {
+        self.bs.numberOfBitsUsed += 8 - (((self.bs.numberOfBitsUsed - 1) & 7) + 1);
+    }
+
+    pub fn len(&self) -> usize {
+        self.bs.numberOfBitsUsed as usize >> 3
+    }
+
+    pub fn len_bits(&self) -> usize {
+        self.bs.numberOfBitsUsed as usize
+    }
+
+    pub fn read_offset(&self) -> usize {
+        self.bs.readOffset as usize >> 3
+    }
+
+    pub fn read_offset_bits(&self) -> usize {
+        self.bs.readOffset as usize
     }
 }
 

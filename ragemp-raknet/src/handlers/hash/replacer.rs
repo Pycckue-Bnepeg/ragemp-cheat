@@ -4,9 +4,7 @@ pub struct Replacer {
 
 impl Replacer {
     pub fn new(origin_host: String) -> Replacer {
-        Replacer {
-            origin_host,
-        }
+        Replacer { origin_host }
     }
 
     pub fn origin_host(&self) -> &str {

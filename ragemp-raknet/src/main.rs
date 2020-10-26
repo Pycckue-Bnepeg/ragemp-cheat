@@ -9,22 +9,32 @@
 #[macro_use]
 extern crate rocket;
 
-pub mod raknet;
-pub mod rage;
+mod bs_test;
 pub mod handler;
 pub mod handlers;
+pub mod rage;
+pub mod raknet;
 
 mod proxy;
 
 use proxy::Proxy;
 
 fn main() {
-    let proxy = Proxy::new("127.0.0.1:22009".parse().unwrap());
-    
+    if let Some(_) = std::env::args().skip(1).next().filter(|arg| arg == "--bs") {
+        println!("{:?}", bs_test::test());
+        return;
+    }
+
+    let mut proxy = Proxy::new("80.66.82.37:22005".parse().unwrap());
+
     if let Err(err) = proxy.startup() {
         eprintln!("startup error: {:?}", err);
         return;
     }
+
+    let handler = handlers::hash::HashReplace::new(0xbb62c5c634026cc6);
+
+    proxy.handlers.push(Box::new(handler));
 
     proxy.run();
 }

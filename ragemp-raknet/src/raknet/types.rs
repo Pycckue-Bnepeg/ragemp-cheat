@@ -221,7 +221,10 @@ impl From<SystemAddress> for SocketAddr {
     fn from(addr: SystemAddress) -> SocketAddr {
         unsafe {
             let bytes = addr.address.addr4.as_ref().sin_addr.S_un.S_un_b.as_ref();
-            SocketAddr::from(([bytes.s_b1, bytes.s_b2, bytes.s_b3, bytes.s_b4], addr.GetPort()))
+            SocketAddr::from((
+                [bytes.s_b1, bytes.s_b2, bytes.s_b3, bytes.s_b4],
+                addr.GetPort(),
+            ))
         }
     }
 }

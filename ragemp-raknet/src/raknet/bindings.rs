@@ -203,18 +203,18 @@ extern "C" {
 impl SocketDescriptor {
     #[inline]
     pub unsafe fn new() -> Self {
-        let mut __bindgen_tmp = ::std::mem::uninitialized();
-        SocketDescriptor_SocketDescriptor(&mut __bindgen_tmp);
-        __bindgen_tmp
+        let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
+        SocketDescriptor_SocketDescriptor(__bindgen_tmp.as_mut_ptr());
+        __bindgen_tmp.assume_init()
     }
     #[inline]
     pub unsafe fn new1(
         _port: ::std::os::raw::c_ushort,
         _hostAddress: *const ::std::os::raw::c_char,
     ) -> Self {
-        let mut __bindgen_tmp = ::std::mem::uninitialized();
-        SocketDescriptor_SocketDescriptor1(&mut __bindgen_tmp, _port, _hostAddress);
-        __bindgen_tmp
+        let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
+        SocketDescriptor_SocketDescriptor1(__bindgen_tmp.as_mut_ptr(), _port, _hostAddress);
+        __bindgen_tmp.assume_init()
     }
 }
 #[doc = " \\brief Network address for a system"]
@@ -524,21 +524,21 @@ impl SystemAddress {
     }
     #[inline]
     pub unsafe fn new() -> Self {
-        let mut __bindgen_tmp = ::std::mem::uninitialized();
-        SystemAddress_SystemAddress(&mut __bindgen_tmp);
-        __bindgen_tmp
+        let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
+        SystemAddress_SystemAddress(__bindgen_tmp.as_mut_ptr());
+        __bindgen_tmp.assume_init()
     }
     #[inline]
     pub unsafe fn new1(str: *const ::std::os::raw::c_char) -> Self {
-        let mut __bindgen_tmp = ::std::mem::uninitialized();
-        SystemAddress_SystemAddress1(&mut __bindgen_tmp, str);
-        __bindgen_tmp
+        let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
+        SystemAddress_SystemAddress1(__bindgen_tmp.as_mut_ptr(), str);
+        __bindgen_tmp.assume_init()
     }
     #[inline]
     pub unsafe fn new2(str: *const ::std::os::raw::c_char, port: ::std::os::raw::c_ushort) -> Self {
-        let mut __bindgen_tmp = ::std::mem::uninitialized();
-        SystemAddress_SystemAddress2(&mut __bindgen_tmp, str, port);
-        __bindgen_tmp
+        let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
+        SystemAddress_SystemAddress2(__bindgen_tmp.as_mut_ptr(), str, port);
+        __bindgen_tmp.assume_init()
     }
 }
 #[doc = " Uniquely identifies an instance of RakPeer. Use RakPeer::GetGuidFromSystemAddress() and RakPeer::GetSystemAddressFromGuid() to go between SystemAddress and RakNetGUID"]
@@ -591,9 +591,9 @@ impl RakNetGUID {
     }
     #[inline]
     pub unsafe fn new() -> Self {
-        let mut __bindgen_tmp = ::std::mem::uninitialized();
-        RakNetGUID_RakNetGUID(&mut __bindgen_tmp);
-        __bindgen_tmp
+        let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
+        RakNetGUID_RakNetGUID(__bindgen_tmp.as_mut_ptr());
+        __bindgen_tmp.assume_init()
     }
 }
 
@@ -641,9 +641,9 @@ impl AddressOrGUID {
     }
     #[inline]
     pub unsafe fn new(packet: *mut Packet) -> Self {
-        let mut __bindgen_tmp = ::std::mem::uninitialized();
-        AddressOrGUID_AddressOrGUID(&mut __bindgen_tmp, packet);
-        __bindgen_tmp
+        let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
+        AddressOrGUID_AddressOrGUID(__bindgen_tmp.as_mut_ptr(), packet);
+        __bindgen_tmp.assume_init()
     }
 }
 #[doc = " This represents a user message from another system."]
@@ -814,9 +814,9 @@ impl RakNetSocket2 {
     }
     #[inline]
     pub unsafe fn new() -> Self {
-        let mut __bindgen_tmp = ::std::mem::uninitialized();
-        RakNetSocket2_RakNetSocket2(&mut __bindgen_tmp);
-        __bindgen_tmp
+        let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
+        RakNetSocket2_RakNetSocket2(__bindgen_tmp.as_mut_ptr());
+        __bindgen_tmp.assume_init()
     }
 }
 extern "C" {
@@ -2160,15 +2160,15 @@ impl BitStream {
     }
     #[inline]
     pub unsafe fn new() -> Self {
-        let mut __bindgen_tmp = ::std::mem::uninitialized();
-        BitStream_BitStream(&mut __bindgen_tmp);
-        __bindgen_tmp
+        let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
+        BitStream_BitStream(__bindgen_tmp.as_mut_ptr());
+        __bindgen_tmp.assume_init()
     }
     #[inline]
     pub unsafe fn new1(initialBytesToAllocate: ::std::os::raw::c_uint) -> Self {
-        let mut __bindgen_tmp = ::std::mem::uninitialized();
-        BitStream_BitStream1(&mut __bindgen_tmp, initialBytesToAllocate);
-        __bindgen_tmp
+        let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
+        BitStream_BitStream1(__bindgen_tmp.as_mut_ptr(), initialBytesToAllocate);
+        __bindgen_tmp.assume_init()
     }
     #[inline]
     pub unsafe fn new2(
@@ -2176,9 +2176,9 @@ impl BitStream {
         lengthInBytes: ::std::os::raw::c_uint,
         _copyData: bool,
     ) -> Self {
-        let mut __bindgen_tmp = ::std::mem::uninitialized();
-        BitStream_BitStream2(&mut __bindgen_tmp, _data, lengthInBytes, _copyData);
-        __bindgen_tmp
+        let mut __bindgen_tmp = ::std::mem::MaybeUninit::uninit();
+        BitStream_BitStream2(__bindgen_tmp.as_mut_ptr(), _data, lengthInBytes, _copyData);
+        __bindgen_tmp.assume_init()
     }
     #[inline]
     pub unsafe fn destruct(&mut self) {
