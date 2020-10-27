@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 use bytes::{Buf, BufMut};
 use twox_hash::XxHash;
 
-const FILENAME: &str = "origin_.js";
+const FILENAME: &str = "origin____.js";
 
 pub struct Manipulator {
     origin_host: String,

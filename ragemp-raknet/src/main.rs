@@ -20,8 +20,17 @@ mod proxy;
 use proxy::Proxy;
 
 fn main() {
+    use std::hash::Hasher;
+    use std::io::Write;
+
+    // 4737987 (hex 484bc3) 48:4b:c3
     if let Some(_) = std::env::args().skip(1).next().filter(|arg| arg == "--bs") {
-        println!("{:?}", bs_test::test());
+        let len = std::fs::metadata("E:\\games\\index.js").unwrap().len();
+        let mut hasher = twox_hash::XxHash64::with_seed(0);
+        hasher.write(&len.to_le_bytes());
+        let hash = hasher.finish();
+        println!("len: {} hash: {:16x} bytes {:16x}", len, hash, len);
+        // println!("{:?}", bs_test::test());
         return;
     }
 
@@ -32,7 +41,7 @@ fn main() {
         return;
     }
 
-    let handler = handlers::hash::HashReplace::new(0xbb62c5c634026cc6);
+    let handler = handlers::hash::HashReplace::new(0xf33cf41fdcc5c61c);
 
     proxy.handlers.push(Box::new(handler));
 
