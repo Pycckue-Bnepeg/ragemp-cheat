@@ -1,6 +1,6 @@
 CC = g++
 
-CFLAGS = -pthread -Wall
+CFLAGS = -m32 -pthread -Wall
 INCLUDES = -I./lib/RakNet/Source -I./lib/RakNet/DependentExtensions
 SRC = ./ragemp-udp/ragemp-udp.cpp ./lib/RakNet/Source/*.cpp
 
