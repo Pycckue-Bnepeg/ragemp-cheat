@@ -1,8 +1,8 @@
 CC = g++
 
-CFLAGS = -m32 -pthread -Wall
-INCLUDES = -I./lib/RakNet/Source -I./lib/RakNet/DependentExtensions
-SRC = ./ragemp-udp/ragemp-udp.cpp ./lib/RakNet/Source/*.cpp
+CFLAGS = -pthread -Wall
+INCLUDES = -I./lib/SLikeNet/Source -I./lib/SLikeNet/DependentExtensions
+SRC = ./ragemp-udp/ragemp-udp.cpp ./lib/SLikeNet/Source/src/*.cpp
 
 OUT_PATH = ./bin/
 OUTPUT = ragemp-udp
