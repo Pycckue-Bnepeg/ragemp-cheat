@@ -1,6 +1,6 @@
 CC = g++
 
-CFLAGS = -pthread -Wall
+CFLAGS = -m32 -pthread -Wall -O3
 INCLUDES = -I./lib/SLikeNet/Source -I./lib/SLikeNet/DependentExtensions
 SRC = ./ragemp-udp/ragemp-udp.cpp ./lib/SLikeNet/Source/src/*.cpp
 

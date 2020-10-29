@@ -26,14 +26,6 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-/*
- * Modified work: Copyright (c) 2017, SLikeSoft UG (haftungsbeschränkt)
- *
- * This source code was modified by SLikeSoft. Modifications are licensed under the MIT-style
- * license found in the license.txt file in the root directory of this source tree.
- * Alternatively you are permitted to license the modifications under the Modified BSD License.
- */
-
 #ifndef CAT_ATOMIC_HPP
 #define CAT_ATOMIC_HPP
 

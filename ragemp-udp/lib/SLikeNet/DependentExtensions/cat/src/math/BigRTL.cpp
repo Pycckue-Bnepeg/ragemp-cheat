@@ -32,7 +32,7 @@
 using namespace cat;
 
 #if defined(CAT_USE_LEGS_ASM64) && defined(CAT_COMPILER_COMPAT_MSVC)
-#pragma comment(lib, "big_x64.lib")
+//#pragma comment(lib, "big_x64.lib")
 #endif
 
 BigRTL::BigRTL(int regs, int bits)

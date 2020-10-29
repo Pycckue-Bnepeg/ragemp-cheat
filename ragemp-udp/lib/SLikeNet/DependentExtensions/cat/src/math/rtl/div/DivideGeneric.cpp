@@ -109,10 +109,10 @@ void CAT_FASTCALL BigRTL::DivideCore(int A_used, Leg A_overflow, Leg *A, int B_u
 
     do
     {
-        A_offset = A + offset;
+        Leg *A_offset = A + offset;
 
         // Trial divide two highest A legs by highest B leg
-        Leg q_lo;
+        Leg q_hi, q_lo;
         CAT_LEG_DIV(A_overflow, A_offset[B_used - 1], B_high, q_hi, q_lo);
 
         Leg p_hi = 0, p_lo, B_last = 0;

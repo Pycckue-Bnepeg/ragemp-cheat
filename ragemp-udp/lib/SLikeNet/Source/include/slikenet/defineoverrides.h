@@ -12,3 +12,6 @@
 
 #define RAKNET_COMPATIBILITY
 #define __BITSTREAM_NATIVE_END
+#define LIBCAT_SECURITY 1
+// #define _DEBUG
+// #define CAT_AUDIT

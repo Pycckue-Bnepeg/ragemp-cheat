@@ -146,14 +146,14 @@ bool FortunaFactory::Reseed()
     Pool[0].BeginKey(POOL_BITS);
 
     // Pool 1 is used every other time, and so on
-    for (int i = 1; i < ENTROPY_POOLS; ++i)
+    for (int ii = 1; ii < ENTROPY_POOLS; ++ii)
     {
-        if (reseed_counter & (1 << (i-1)))
+        if (reseed_counter & (1 << (ii-1)))
         {
-            Pool[i].End();
-            Pool[i].Generate(PoolOutput, POOL_BYTES);
+            Pool[ii].End();
+            Pool[ii].Generate(PoolOutput, POOL_BYTES);
             NextSeed.Crunch(PoolOutput, POOL_BYTES);
-            Pool[i].BeginKey(POOL_BITS);
+            Pool[ii].BeginKey(POOL_BITS);
         }
     }
 
@@ -188,8 +188,8 @@ bool FortunaFactory::Initialize()
     reseed_counter = 0;
 
     // Initialize all the pools
-    for (int i = 0; i < ENTROPY_POOLS; ++i)
-        Pool[i].BeginKey(POOL_BITS);
+    for (int ii = 0; ii < ENTROPY_POOLS; ++ii)
+        Pool[ii].BeginKey(POOL_BITS);
 
     // Initialize the various OS-dependent entropy sources
     if (!InitializeEntropySources())

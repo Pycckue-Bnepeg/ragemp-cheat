@@ -49,6 +49,14 @@ int main(int argc, char *argv[])
 
 	SocketDescriptor local_socket(proxy_port, "0.0.0.0");
 
+	// TODO: force enable encryption?
+
+	// cat::EasyHandshake handshake;
+	// char proxy_public_key[cat::EasyHandshake::PUBLIC_KEY_BYTES];
+	// char proxy_private_key[cat::EasyHandshake::PRIVATE_KEY_BYTES];
+	// handshake.GenerateServerKey(proxy_public_key, proxy_private_key);
+	// proxy->InitializeSecurity(proxy_public_key, proxy_private_key, false);
+
 	if (proxy->Startup(8, &local_socket, 1) != RAKNET_STARTED)
 	{
 		std::cerr << "couldn't start a proxy server" << std::endl;
@@ -132,7 +140,9 @@ int main(int argc, char *argv[])
 				std::cout << "remote server isn't secure, change secure policy" << std::endl;
 				remote->CancelConnectionAttempt(remote_address);
 				public_key.publicKeyMode = PKM_INSECURE_CONNECTION;
-				remote->Connect(remote_addr.c_str(), remote_port, 0, 0, &public_key);
+				auto result = remote->Connect(remote_addr.c_str(), remote_port, 0, 0, &public_key);
+
+				std::cout << "Connect result " << result << std::endl;
 			}
 
 			if ((int)remote_packet->data[0] == ID_CONNECTION_REQUEST_ACCEPTED)
@@ -179,11 +189,12 @@ int main(int argc, char *argv[])
 							bits_to_read = 16;
 						}
 
-						char *buffer = (char *)malloc(BITS_TO_BYTES(bits_to_read));
+						// char *buffer = (char *)malloc(BITS_TO_BYTES(bits_to_read));
 
 						// похоже на порт откуда качать говно
 						// хост, если не указан fast-dl-host, то просто порт, иначе адрес
-						out.ReadBits((unsigned char *)buffer, bits_to_read);
+						// out.ReadBits((unsigned char *)buffer, bits_to_read);
+						out.IgnoreBits(bits_to_read);
 
 						std::uint16_t voice_sample_rate = 0;
 						out.Read(voice_sample_rate);
@@ -218,6 +229,6 @@ int main(int argc, char *argv[])
 			remote->DeallocatePacket(remote_packet);
 		}
 
-		RakSleep(5);
+		RakSleep(0);
 	}
 }

@@ -101,7 +101,7 @@ bool FortunaFactory::InitializeEntropySources()
     if (!CryptAcquireContext(&hCryptProv, 0, 0, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
         return false;
 
-	NTDLL = LoadLibraryA("NtDll.dll");
+	NTDLL = LoadLibrary("NtDll.dll");
 	if (NTDLL)
 		NtQuerySystemInformation = (PtNtQuerySystemInformation)GetProcAddress(NTDLL, "NtQuerySystemInformation");
 
@@ -154,10 +154,10 @@ void FortunaFactory::PollInvariantSources(int pool_index)
 	if (NtQuerySystemInformation)
 	{
 		u8 sysbuf[640];
-		for (int i = 0; i < 128; ++i)
+		for (int ii = 0; ii < 128; ++ii)
 		{
 			ULONG retlen = 0;
-			if (NtQuerySystemInformation(i, sysbuf, sizeof(sysbuf), &retlen) == 0 && retlen > 0)
+			if (NtQuerySystemInformation(ii, sysbuf, sizeof(sysbuf), &retlen) == 0 && retlen > 0)
 				pool.Crunch(sysbuf, retlen);
 		}
 	}
@@ -179,15 +179,10 @@ void FortunaFactory::PollInvariantSources(int pool_index)
 		pool.Crunch(user_name, user_len * sizeof(TCHAR));
 
     // Hardware profile
-    GetCurrentHwProfile(&Sources.hw_profile);
+    GetCurrentHwProfileA(&Sources.hw_profile);
 
     // Windows version
-	#pragma warning(push)
-	// allow using deprecated function - we cannot switch the code to use the suggested VerifyVersionInfo() function
-	// since that would require an API/ABI breakage here
-	#pragma warning(disable:4996)
-	Sources.win_ver = GetVersion();
-	#pragma warning (pop)
+    Sources.win_ver = GetVersion();
 
     // Registry quota
     GetSystemRegistryQuota(&Sources.reg_quota[0], &Sources.reg_quota[1]);

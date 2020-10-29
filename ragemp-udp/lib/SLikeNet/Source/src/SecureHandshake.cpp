@@ -16,16 +16,15 @@
 /// \file
 ///
 
-
 #include "slikenet/NativeFeatureIncludes.h"
 
-#if LIBCAT_SECURITY==1
+#if LIBCAT_SECURITY == 1
 
 // If building a RakNet DLL, be sure to tweak the CAT_EXPORT macro meaning
 #if !defined(_RAKNET_LIB) && defined(_RAKNET_DLL)
-# define CAT_BUILD_DLL
+#define CAT_BUILD_DLL
 #else
-# define CAT_NEUTER_EXPORT
+#define CAT_NEUTER_EXPORT
 #endif
 
 #include "cat/src/port/EndianNeutral.cpp"
@@ -35,23 +34,9 @@
 #include "cat/src/threads/Thread.cpp"
 #include "cat/src/threads/WaitableFlag.cpp"
 #include "cat/src/hash/MurmurHash2.cpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4706)	// assignment within conditional expression
-#endif
 #include "cat/src/lang/Strings.cpp"
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4706)	// assignment within conditional expression
-#endif
 #include "cat/src/math/BigRTL.cpp"
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 #include "cat/src/math/BigPseudoMersenne.cpp"
 #include "cat/src/math/BigTwistedEdwards.cpp"
 
@@ -68,14 +53,7 @@
 #include "cat/src/crypt/rand/EntropyLinux.cpp"
 #include "cat/src/crypt/rand/EntropyWindowsCE.cpp"
 #include "cat/src/crypt/rand/EntropyGeneric.cpp"
-#ifdef _M_X64
-#pragma warning(push)
-#pragma warning(disable:4838)
-#endif
 #include "cat/src/crypt/rand/Fortuna.cpp"
-#ifdef _M_X64
-#pragma warning(pop)
-#endif
 
 #include "cat/src/crypt/tunnel/KeyAgreement.cpp"
 #include "cat/src/crypt/tunnel/AuthenticatedEncryption.cpp"
